@@ -34,14 +34,8 @@ public class Order {
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
-	//if there is no cascade
-	//persist(orderItemA)
-	//persist(orderItemB)
-	//persist(orderItemC)
-	//persist(order)
 
 	//there is cascade spread persist
-	//only persist(order)
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name="delivery_id")
 	private Delivery delivery;
@@ -69,15 +63,4 @@ public class Order {
 		this.delivery = delivery;
 		delivery.setOrder(this);
 	}
-
-	// if there is no set Method you have to code like below
-	// public static void main(String[] args){
-	// 	Member member = new Member();
-	// 	Order order = new Order();
-	//
-	// 	member.getOrders().add(order);
-	// 	order.setMember(member);
-	//  //if method set only
-	//  order.setMember(member);
-	// }
 }
