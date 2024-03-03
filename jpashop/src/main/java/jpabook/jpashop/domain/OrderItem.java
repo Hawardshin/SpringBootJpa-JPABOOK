@@ -1,5 +1,7 @@
 package jpabook.jpashop.domain;
 
+import org.aspectj.weaver.ast.Or;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,6 +28,28 @@ public class OrderItem {
 	@JoinColumn(name="order_id") //The @JoinColumn annotation specifies the column used to implement this relationship in the actual database table.
 	private Order order;
 
-	private Long orderPrice; //order Price because Item cost can change
-	private Long count; //order count
+	private int orderPrice; //order Price because Item cost can change
+	private int count; //order count
+
+	//create Method (생성 메서드)
+	public static OrderItem createOrderItem(Item item, int orderPrice, int count){
+		OrderItem orderItem = new OrderItem();
+		orderItem.setItem(item);
+		orderItem.setOrderPrice(orderPrice);
+		orderItem.setCount(count);
+
+		item.removeStock(count);
+		return orderItem;
+	}
+
+	//business logic
+	public void cancel(){
+		getItem().addStock(count);
+	}
+
+
+	//look up logic
+	public int getTotalPrice(){
+		return getTotalPrice() * getCount();
+	}
 }
