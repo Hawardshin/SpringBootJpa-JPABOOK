@@ -36,4 +36,23 @@ public abstract class Item {
 	@ManyToMany(mappedBy = "items")
 	private List<Category> categories = new ArrayList<>();
 
+	//--- business logic ---- //
+
+	/**
+	 * stock increase
+	 */
+	public void addStock(int quantity){
+		this.stockQuantity += quantity;
+	}
+
+	/**
+	 * decrease stock
+	 */
+	public void removeStock(int quantity){
+		int restStock = this.stockQuantity - quantity;
+		if (restStock < 0){
+			throw new NotEnoughStockException("need more stock");
+		}
+		this.stockQuantity = restStock;
+	}
 }
