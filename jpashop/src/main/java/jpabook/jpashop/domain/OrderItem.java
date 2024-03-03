@@ -54,6 +54,6 @@ public class OrderItem {
 
 	//look up logic
 	public int getTotalPrice(){
-		return getTotalPrice() * getCount();
+		return getOrderPrice() * getCount();
 	}
 }

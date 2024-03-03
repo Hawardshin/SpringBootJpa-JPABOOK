@@ -15,6 +15,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jpabook.jpashop.domain.Category;
+import jpabook.jpashop.execption.NotEnoughStockException;
 import lombok.Getter;
 import lombok.Setter;
 
