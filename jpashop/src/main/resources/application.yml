@@ -8,7 +8,7 @@ spring:
 # this ddl-auto mean when application start all table drop
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none # table 이 드랍되지 않는다. create의 경우 드랍됨
     properties:
       hibernate:
         format_sql: true
