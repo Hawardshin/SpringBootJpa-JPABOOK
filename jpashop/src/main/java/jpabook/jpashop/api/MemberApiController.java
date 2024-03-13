@@ -9,14 +9,43 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberApiController {
     private final MemberService memberService;
 
-    @PostMapping("/api/v1/members")
+    @GetMapping("/api/v1/members")
+    public List<Member> memberV1(){//문제점 : 이렇게 엔티티를 직접 노출하면 원치 않는 데이터도 다 날라갑니다.
+        //또한 이전에 말했듯, api 스펙이 바뀌는 문제가 생깁니다.
+        return memberService.findMembers();
+    }
 
+    @GetMapping("/api/v2/members")
+    public Result memberV2(){
+        List<Member> findMembers = memberService.findMembers();
+        List<MemberDto> collect = findMembers.stream()
+                .map(m -> new MemberDto(m.getName()))
+                .collect(Collectors.toList());
+        return new Result(collect.size(),collect);
+        //이렇게 return 에 dto를 따로 만들면 데이터를 List형식이 아니여도 쉽게 추가를 할 수가 있습니다.
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class Result<T>{ //제네릭을 이용한 return Dto
+        private int count;
+        private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDto{
+        private String name;
+    }
+    @PostMapping("/api/v1/members")
     public CreateMemberResponse saveMemberV1(@RequestBody @Valid Member member){ //valid 어노테이션을 사용하면 Member에 있는 @NotEmpty, @NotNull 등의 어노테이션을 사용할 수 있다?
     // @RequestBody @Valid Member member -> json데이터를 멤버로 바꿔주는 것 (json 말고 다른 것도 되긴 함.)
         //이렇게 보내면 NULL이라도 들어갈 수 있다.
