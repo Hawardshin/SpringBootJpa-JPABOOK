@@ -92,4 +92,14 @@ public class OrderRepository {
 		TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000 건
 		return query.getResultList();
 	}
+
+    public List<Order> findAllWithMemberDelivery() {// 이경우는 lazy 로딩이 아니라 한번에 값을 다 가져와서 join을 미리 시켜버립니다.
+		//이러한 방법을 fetch join 이라고 한다. --> 매우 중요(꼭 책이나 강좌를 통해 이해하기) -> 대부분의 성능문제는 여기서 해결된다.
+		//jpa만 있는 fetch라는 문법
+		return em.createQuery(
+				"select o from Order o" +
+						" join fetch o.member m" +
+						" join fetch o.delivery", Order.class
+		).getResultList();
+    }
 }
