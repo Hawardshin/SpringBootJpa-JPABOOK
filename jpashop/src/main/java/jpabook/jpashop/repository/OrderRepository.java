@@ -1,6 +1,7 @@
 package jpabook.jpashop.repository;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import jakarta.persistence.EntityManager;
@@ -93,6 +94,7 @@ public class OrderRepository {
 		return query.getResultList();
 	}
 
+	// 재활용 가능
     public List<Order> findAllWithMemberDelivery() {// 이경우는 lazy 로딩이 아니라 한번에 값을 다 가져와서 join을 미리 시켜버립니다.
 		//이러한 방법을 fetch join 이라고 한다. --> 매우 중요(꼭 책이나 강좌를 통해 이해하기) -> 대부분의 성능문제는 여기서 해결된다.
 		//jpa만 있는 fetch라는 문법
@@ -102,4 +104,23 @@ public class OrderRepository {
 						" join fetch o.delivery", Order.class
 		).getResultList();
     }
+
+	//화면에는 최적화 단, 재사용 불가라는 단점이 존재.
+	//또한 엔티티를 바꾸는게 아니라 dto를 조회하는 것
+	//단 화면 로직에 사실상 의존하고 있어서 계층이 붕괴 딜 수 있다는 단점이 존재한다.
+	// 그리고 이것이 성능을 그렇게 크게 늘려주는 것도 아닐 수 있다.
+	public List<OrderSimpleQueryDto> findOrderDtos() {
+//		이렇게는 안된다는 걸 알고 가기! 꼭 new 를 써야만 합니다.
+//		return em.createQuery(
+//				"select o from Order o" +
+//						" join o.member m" +
+//						" join o.delivery d", OrderSimpleQueryDto.class
+//		).getResultList();
+		return em.createQuery(
+				"select new jpabook.jpashop.repository.OrderSimpleQueryDto(o.id,  m.name, o.orderDate,o.status, d.address)" +
+						"from Order o" +
+						" join o.member m" +
+						" join o.delivery d", OrderSimpleQueryDto.class
+		).getResultList();
+	}
 }
