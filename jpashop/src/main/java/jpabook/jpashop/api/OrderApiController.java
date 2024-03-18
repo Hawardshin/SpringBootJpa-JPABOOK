@@ -45,6 +45,15 @@ public class OrderApiController {
         return collect;
     }
 
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> orderV3(){
+        List<Order> orders = orderRepository.findAllWithItem();
+        List<OrderDto> collect = orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+        return collect;
+    }
+
 
     // 주석 친 부분: 이것이 얼핏 보기엔 Dto로 잘 반환한 것 같지만, 그게 아니다. Dto내부에서 엔티티를 반환하는 코드가 있기 때문에 이것도 좋지 못한 방법이다.
 

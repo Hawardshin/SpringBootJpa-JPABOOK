@@ -106,4 +106,23 @@ public class OrderRepository {
     }
 
 
+	public List<Order> findAllWithItem() { //db의 distinct말고 한가지 더 기능을 한다.(sql에 distinct) 단 db의 distinct는 한줄이 완전히 똑같해야 distinct가 먹히는데,
+		//jpa에서 자체적으로 Order를 가져올 때 같은 값이면 중복을 버려준다.(루트 엔티티의 중복을 걸러서 담아줌)
+		// 컬렉션 페치조인을 따로 이야기 하는 이유.
+		// 일대다 문제는 distinct 를 통해서 해결하긴 했다.
+		// 단, 이 방법은 페이징이 불가능해진다. (일대다를 패치조인 하는 순간 페이징은 아에 불가능)
+		//페이징이란 아래 주석 친 것처럼 몇개만 가져오겠다는 의미이다.
+		//이게 문제가 페이징이 페치조인 이후에 리미트를 메모리에서 처리하기 때문에 outOfMemory가 날 가능성이 높다.
+		//컬렉션 패치 조인은 한개만 사용해라. 데이터가 부정합해질 수 있다.
+		return em.createQuery(
+				"select distinct o from Order o" +
+						" join fetch o.member m" +
+						" join fetch o.delivery d" +
+						" join fetch o.orderItems oi" +
+						" join fetch oi.item i", Order.class)
+				//.setFirstResult(1)
+				//.setMaxResult(100)
+				.getResultList();
+
+	}
 }
