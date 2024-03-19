@@ -12,6 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100 # 이 사이즈가 최소는 없는데 1000개가 최대이다. (1000개 이상이면 오류를 일으키는 db가 몇개 있음)
 #      show_sql :true
 # show_sql -> system out
 # org.hibernate.SQL
