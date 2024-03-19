@@ -24,6 +24,7 @@ public class OrderItem {
 	@Column(name = "order_item_id")
 	private Long id;
 
+	//여기서 Batch는 여기 적으면 안되고 Item에 적어야한다.
 	@ManyToOne(fetch= FetchType.LAZY)
 	@JoinColumn(name="item_id")
 	private Item item;
