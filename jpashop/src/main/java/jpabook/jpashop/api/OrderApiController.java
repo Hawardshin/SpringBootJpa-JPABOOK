@@ -75,6 +75,13 @@ public class OrderApiController {
         return orderQueryRepository.findOrderQueryDtos();
     }
 
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> orderV5() {
+        return orderQueryRepository.findAllByDto_optimization();
+    }
+
+
+
 
     // 주석 친 부분: 이것이 얼핏 보기엔 Dto로 잘 반환한 것 같지만, 그게 아니다. Dto내부에서 엔티티를 반환하는 코드가 있기 때문에 이것도 좋지 못한 방법이다.
 
