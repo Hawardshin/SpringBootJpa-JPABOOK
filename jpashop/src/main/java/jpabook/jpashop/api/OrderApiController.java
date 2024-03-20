@@ -30,13 +30,10 @@ public class OrderApiController {
     public List<Order> ordersV1() {
         List<Order> all = orderRepository.findAllByString(new OrderSearch());
         for (Order order : all) {
-            order.getMember().getName();
+            order.getMember().getName(); //지연로딩 밣생 false로 발생시 지연로딩 실패로 프록시 객체 초기화 실패
             order.getDelivery().getAddress();
             List<OrderItem> orderItems = order.getOrderItems();
             orderItems.stream().forEach(o->o.getItem().getName());
-//            for (OrderItem orderItem : orderItems) {
-//                orderItem.getItem().getName();
-//            }
         }
         return all;
     }
