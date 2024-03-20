@@ -2,6 +2,10 @@ package jpabook.jpashop.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jpabook.jpashop.domain.*;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import jakarta.persistence.EntityManager;
@@ -12,14 +16,20 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jpabook.jpashop.domain.Member;
-import jpabook.jpashop.domain.Order;
 import lombok.RequiredArgsConstructor;
 
+import static jpabook.jpashop.domain.QMember.*;
+import static jpabook.jpashop.domain.QOrder.*;
+
 @Repository
-@RequiredArgsConstructor
 public class OrderRepository {
 	private final EntityManager em;
+	private final JPAQueryFactory query;
+
+	public OrderRepository(EntityManager em) {
+		this.em = em;
+		this.query = new JPAQueryFactory(em);
+	}
 
 	public void save(Order order){
 		em.persist(order);
@@ -92,6 +102,42 @@ public class OrderRepository {
 		cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
 		TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000 건
 		return query.getResultList();
+	}
+	//querydsl을 사용하면 코드의 재사용성이 늘어남.
+	public List<Order> findAll2(OrderSearch orderSearch){
+		return query
+				.select(order)
+				.from(order)
+				.where(statusEq(orderSearch.getOrderStatus()))
+				.fetch();
+	}
+
+	//오타가 잡히는 강력한 장점. 컴파일 시점에 오타가 잡힌다.
+	public List<Order> findALll(OrderSearch orderSearch){
+		//여기서 QOrder를 static import해서 코드를 줄일 수 있다.
+	/*	QOrder order = QOrder.order;
+		QMember member = QMember.member;*/
+		return query.select(order)
+			.from(order)
+			.join(order.member, member)
+//			.where(order.status.eq(orderSearch.getOrderStatus())) 정적 쿼리 방식
+			//member.name.like(orderSearch.getName
+			.where(statusEq(orderSearch.getOrderStatus()), nameLike(orderSearch.getMemberName()))
+			.limit(1000)
+			.fetch();
+	}
+
+	private BooleanExpression statusEq(OrderStatus statusCond){
+		if (statusCond == null) {
+			return null;
+		}
+		return order.status.eq(statusCond);
+	}
+	private BooleanExpression nameLike(String nameCond){
+		if (!StringUtils.hasText(nameCond)) {
+			return null;
+		}
+		return member.name.like(nameCond);
 	}
 
 	// 재활용 가능
