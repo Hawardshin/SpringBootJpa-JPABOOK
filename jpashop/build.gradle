@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.0'
 	id 'io.spring.dependency-management' version '1.1.4'
+	// id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" // ⭐ Querydsl 플러그인 사용 X 추후 배포시 gradlew 할때 에러 발생
 }
 group = 'jpabook'
 version = '0.0.1-SNAPSHOT'
@@ -28,13 +29,24 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
-	//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	//	lec is junit 4 if you can follow it jpa5 you will not change this comment
 	testImplementation("org.junit.vintage:junit-vintage-engine") {
 		exclude group: "org.hamcrest", module: "hamcrest-core"
 	}
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//Querydsl 추가
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+clean {
+	delete file('src/main/generated')
 }
